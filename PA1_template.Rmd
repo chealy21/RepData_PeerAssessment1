@@ -4,14 +4,18 @@ output:
   html_document:
     keep_md: yes
 ---
-
+## Loading necessary libraries
+```{r}
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(lattice))
+```
 
 ## Loading and preprocessing the data
 ```{r, echo=TRUE}
 unzip("activity.zip")
 dat<-read.csv("activity.csv",header=TRUE)
 
-library(dplyr)
+
 
 totalsteps<- dat %>% group_by(date) %>% summarize(steps=sum(steps, na.rm=TRUE))
 
@@ -47,6 +51,7 @@ NAvalues<-sum(is.na(dat$steps))
 ```
 The total number of observations missing steps is `r NAvalues`.
 
+The mean steps for that interval was used to fill in the missing values. To do this, I joined the mean steps per interval to the main data frame, and substituting the mean steps per interval into the missing value using a subset function. 
 ```{r}
 meansteps<-dat %>% group_by(interval) %>% summarize(meansteps=mean(steps, na.rm=TRUE))
 datfill<-right_join(dat,meansteps)
@@ -63,7 +68,6 @@ The mean total number of steps is `r meansteps2` and the median total number of 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ```{r}
-library(lattice)
 datfill<- datfill %>% transform(date=as.character(date))
 datfill<- datfill %>% transform(date=as.character(date)) %>% transform(date=strptime(date,"%Y-%m-%d")) %>% transform(date=as.POSIXct(date))
 

@@ -4,7 +4,12 @@ output:
   html_document:
     keep_md: yes
 ---
+## Loading necessary libraries
 
+```r
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(lattice))
+```
 
 ## Loading and preprocessing the data
 
@@ -12,33 +17,14 @@ output:
 unzip("activity.zip")
 dat<-read.csv("activity.csv",header=TRUE)
 
-library(dplyr)
-```
 
-```
-## 
-## Attaching package: 'dplyr'
-```
 
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```r
 totalsteps<- dat %>% group_by(date) %>% summarize(steps=sum(steps, na.rm=TRUE))
 
 hist(totalsteps$steps, main="Histogram of Total Steps per Day", xlab="Total Steps")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
 
 
 
@@ -58,7 +44,7 @@ interval<- dat %>% group_by(interval) %>% summarize(meansteps=mean(steps, na.rm=
 plot(interval$interval, interval$meansteps, type="l", main="Time Series Plot of Mean Steps by Interval", xlab="5 Minute Interval", ylab="Mean Steps")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 ```r
 maxsteps<-interval[which.max(interval$meansteps),]
@@ -74,6 +60,7 @@ NAvalues<-sum(is.na(dat$steps))
 ```
 The total number of observations missing steps is 2304.
 
+The mean steps for that interval was used to fill in the missing values. To do this, I joined the mean steps per interval to the main data frame, and substituting the mean steps per interval into the missing value using a subset function. 
 
 ```r
 meansteps<-dat %>% group_by(interval) %>% summarize(meansteps=mean(steps, na.rm=TRUE))
@@ -90,7 +77,7 @@ totalsteps<- datfill %>% group_by(date) %>% summarize(steps=sum(steps, na.rm=TRU
 hist(totalsteps$steps, main="Histogram of Total Steps per Day", xlab="Total Steps")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ```r
 meansteps2<-mean(totalsteps$steps)
@@ -104,7 +91,6 @@ The mean total number of steps is 1.0766189\times 10^{4} and the median total nu
 ## Are there differences in activity patterns between weekdays and weekends?
 
 ```r
-library(lattice)
 datfill<- datfill %>% transform(date=as.character(date))
 datfill<- datfill %>% transform(date=as.character(date)) %>% transform(date=strptime(date,"%Y-%m-%d")) %>% transform(date=as.POSIXct(date))
 
@@ -117,4 +103,4 @@ names(avgtypeint)<-c("interval","daytype","avgsteps")
 xyplot(avgsteps ~ interval|daytype, data=avgtypeint,layout=c(1,2),type="l",xlab="Five Minute Interval",ylab="Average Total Steps Taken")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
