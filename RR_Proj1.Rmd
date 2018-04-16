@@ -1,0 +1,78 @@
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: yes
+---
+
+
+## Loading and preprocessing the data
+```{r, echo=TRUE}
+unzip("activity.zip")
+dat<-read.csv("activity.csv",header=TRUE)
+
+library(dplyr)
+
+totalsteps<- dat %>% group_by(date) %>% summarize(steps=sum(steps, na.rm=TRUE))
+
+hist(totalsteps$steps, main="Histogram of Total Steps per Day", xlab="Total Steps")
+
+```
+
+
+
+## What is mean total number of steps taken per day?
+```{r}
+meansteps1<-mean(totalsteps$steps)
+mediansteps1<-median(totalsteps$steps)
+```
+
+The mean total steps per day is `r meansteps1`, and the mediean total steps per day is `r mediansteps1`.
+
+## What is the average daily activity pattern?
+```{r}
+interval<- dat %>% group_by(interval) %>% summarize(meansteps=mean(steps, na.rm=TRUE))
+plot(interval$interval, interval$meansteps, type="l", main="Time Series Plot of Mean Steps by Interval", xlab="5 Minute Interval", ylab="Mean Steps")
+
+maxsteps<-interval[which.max(interval$meansteps),]
+
+```
+
+The maximum average steps of `r maxsteps$meansteps` occur during interval `r maxsteps$interval`.
+
+
+## Imputing missing values
+```{r}
+NAvalues<-sum(is.na(dat$steps))
+```
+The total number of observations missing steps is `r NAvalues`.
+
+```{r}
+meansteps<-dat %>% group_by(interval) %>% summarize(meansteps=mean(steps, na.rm=TRUE))
+datfill<-right_join(dat,meansteps)
+datfill$steps[is.na(datfill$steps)]<-datfill$meansteps[is.na(datfill$steps)]
+totalsteps<- datfill %>% group_by(date) %>% summarize(steps=sum(steps, na.rm=TRUE))
+hist(totalsteps$steps, main="Histogram of Total Steps per Day", xlab="Total Steps")
+meansteps2<-mean(totalsteps$steps)
+mediansteps2<-median(totalsteps$steps)
+meandiff<-meansteps2-meansteps1
+mediandiff<-mediansteps2-mediansteps1
+```
+The mean total number of steps is `r meansteps2` and the median total number of steps is `r mediansteps2`. The difference between the mean steps is `r meandiff`. The difference between the median steps is `r mediandiff`.
+
+
+## Are there differences in activity patterns between weekdays and weekends?
+```{r}
+library(lattice)
+datfill<- datfill %>% transform(date=as.character(date))
+datfill<- datfill %>% transform(date=as.character(date)) %>% transform(date=strptime(date,"%Y-%m-%d")) %>% transform(date=as.POSIXct(date))
+
+datfill <- datfill %>% mutate(daytype=as.factor(ifelse(weekdays(datfill$date) %in% c("Saturday","Sunday"),"weekend","weekday")))
+
+avgtypeint<-datfill %>% group_by(interval,daytype) %>% summarize(mean(steps))
+
+names(avgtypeint)<-c("interval","daytype","avgsteps")
+
+xyplot(avgsteps ~ interval|daytype, data=avgtypeint,layout=c(1,2),type="l",xlab="Five Minute Interval",ylab="Average Total Steps Taken")
+
+```
