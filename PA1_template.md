@@ -7,12 +7,11 @@ output:
 ## Loading necessary libraries
 
 ```r
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='figures/',
+                      echo=TRUE, warning=FALSE, message=FALSE)
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(lattice))
 ```
-
-## Display figure information
-
 
 ## Loading and preprocessing the data
 
@@ -27,7 +26,7 @@ totalsteps<- dat %>% group_by(date) %>% summarize(steps=sum(steps, na.rm=TRUE))
 hist(totalsteps$steps, main="Histogram of Total Steps per Day", xlab="Total Steps")
 ```
 
-![](Figs/unnamed-chunk-2-1.png)<!-- -->
+![](figures/unnamed-chunk-1-1.png)<!-- -->
 
 
 
@@ -47,7 +46,7 @@ interval<- dat %>% group_by(interval) %>% summarize(meansteps=mean(steps, na.rm=
 plot(interval$interval, interval$meansteps, type="l", main="Time Series Plot of Mean Steps by Interval", xlab="5 Minute Interval", ylab="Mean Steps")
 ```
 
-![](Figs/unnamed-chunk-4-1.png)<!-- -->
+![](figures/unnamed-chunk-3-1.png)<!-- -->
 
 ```r
 maxsteps<-interval[which.max(interval$meansteps),]
@@ -73,7 +72,7 @@ totalsteps<- datfill %>% group_by(date) %>% summarize(steps=sum(steps, na.rm=TRU
 hist(totalsteps$steps, main="Histogram of Total Steps per Day", xlab="Total Steps")
 ```
 
-![](Figs/unnamed-chunk-6-1.png)<!-- -->
+![](figures/unnamed-chunk-5-1.png)<!-- -->
 
 ```r
 meansteps2<-mean(totalsteps$steps)
@@ -99,4 +98,4 @@ names(avgtypeint)<-c("interval","daytype","avgsteps")
 xyplot(avgsteps ~ interval|daytype, data=avgtypeint,layout=c(1,2),type="l",xlab="Five Minute Interval",ylab="Average Total Steps Taken")
 ```
 
-![](Figs/unnamed-chunk-7-1.png)<!-- -->
+![](figures/unnamed-chunk-6-1.png)<!-- -->

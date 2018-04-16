@@ -124,11 +124,10 @@ $(document).ready(function () {
 
 <div id="loading-necessary-libraries" class="section level2">
 <h2>Loading necessary libraries</h2>
-<pre class="r"><code>suppressPackageStartupMessages(library(dplyr))
+<pre class="r"><code>knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='figures/',
+                      echo=TRUE, warning=FALSE, message=FALSE)
+suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(lattice))</code></pre>
-</div>
-<div id="display-figure-information" class="section level2">
-<h2>Display figure information</h2>
 </div>
 <div id="loading-and-preprocessing-the-data" class="section level2">
 <h2>Loading and preprocessing the data</h2>
